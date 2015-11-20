@@ -11,4 +11,7 @@ int verbose;                    /* if true, print additional output   */
 
 extern void unix_error(char *msg);
 
+/* print a message only if verbose mode is active */
+extern void verbose_printf(const char *format, ...);
+
 #endif

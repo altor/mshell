@@ -17,15 +17,15 @@
  */
 int sigaction_wrapper(int signum, handler_t * handler) {
     
-	struct sigaction action;
-	action.sa_flags = SA_RESTART;
-	sigemptyset(&action.sa_mask);
-	action.sa_handler = handler;
-	if(sigaction(signum, &action, NULL) < 0){
-		unix_error("(Error sigaction_wrapper) ");
-	}
+  struct sigaction action;
+  action.sa_flags = SA_RESTART;
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = handler;
+  if(sigaction(signum, &action, NULL) < 0){
+    unix_error("(Error sigaction_wrapper) ");
+  }
 
-    	return 1;
+  return 1;
 }
 
 /*
@@ -37,36 +37,29 @@ int sigaction_wrapper(int signum, handler_t * handler) {
 void sigchld_handler(int sig) {
   int status;
   pid_t pid;
-  if (verbose)
-      printf("sigchld_handler: entering\n");
+
+  verbose_printf("sigchld_handler: entering\n");
 
   while((pid = waitpid(-1,&status,WNOHANG | WUNTRACED)) > 0) {
-
-    if(WIFEXITED(status)) {
-      if(verbose)
-	printf("child terminated normally\n");
+    if(WIFEXITED(status)){
+      
+      verbose_printf("sigchld_handler : child terminated normally\n");
       jobs_deletejob(pid);
     }
 
     if(WIFSIGNALED(status)) {
-      if(verbose)
-	printf("child terminate because of a non catched signal\n");
+	verbose_printf("sigchld_handler : child terminate because of a non catched signal\n");
       jobs_deletejob(pid);
     }
     
     if(WIFSTOPPED(status)) {
-      if(verbose)
-	printf("child stopped\n");
+      verbose_printf("sigchld_handler : child stopped\n");
       (jobs_getjobpid(pid))->jb_state = ST;
     }
-    
   }
-    
 
-  if (verbose)
-      printf("sigchld_handler: exiting\n");
-
-    return;
+  verbose_printf("sigchld_handler: exiting\n");
+  return;
 }
 
 /*
@@ -76,20 +69,22 @@ void sigchld_handler(int sig) {
  */
 void sigint_handler(int sig) {
 
-	pid_t pid;
+  pid_t pid;
 
-    if (verbose)
-        printf("sigint_handler: entering\n");
+  verbose_printf("sigint_handler: entering\n");
 
-	pid = jobs_fgpid();
-	if(kill(pid, sig) < 0){
-		unix_error("(Error sigint_handler) ");
-	}
-
-    if (verbose)
-        printf("sigint_handler: exiting\n");
-
+  if((pid = jobs_fgpid()) == 0){
+    verbose_printf("no job in foreground\n");
     return;
+  }
+  
+  if(kill(pid, sig) < 0){
+    unix_error("(Error sigint_handler) ");
+  }
+
+  verbose_printf("sigint_handler: exiting\n");
+
+  return;
 }
 
 /*
@@ -99,20 +94,22 @@ void sigint_handler(int sig) {
  */
 void sigtstp_handler(int sig) {
 
-	pid_t pid;
+  pid_t pid;
 	
-    if (verbose)
-        printf("sigtstp_handler: entering\n");
-
-	pid = jobs_fgpid();
-
-	if(kill(pid, sig) < 0){
-		unix_error("(Error sigint_handler) ");
-	}
+  verbose_printf("sigtstp_handler: entering\n");
 
 
-    if (verbose)
-        printf("sigtstp_handler: exiting\n");
-
+  if((pid = jobs_fgpid()) == 0){
+    verbose_printf("sigtstp_handler : no job in foreground\n");
     return;
+  }
+   
+  if(kill(pid, sig) < 0){
+    unix_error("(Error sigtstp_handler) ");
+  }
+
+
+  verbose_printf("sigtstp_handler: exiting\n");
+
+  return;
 }
