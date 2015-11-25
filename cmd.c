@@ -160,22 +160,50 @@ void do_kill(char **argv) {
   kill(pid, SIGKILL);
   if(!jobs_deletejob(pid))
     unix_error("(error while delete job in job_list)\n");
+ 
   verbose_printf("do_kill : process %d killed\n", pid);
   verbose_printf("do_kill : exit\n");
 
   return;
 }
 
+
+
+
 /* do_exit - Execute the builtin exit command */
 void do_exit() {
-  printf("do_exit : To be implemented\n");
 
+  int i;
+  pid_t pid;
+  struct job_t * job;
+
+  verbose_printf("do_exit : entering\n");
+  
+  for(i = 0 ; i < jobs_maxjid() ; i++){
+
+    job = jobs_getjobjid(i+1);
+    pid = job->jb_pid;
+    
+    kill(pid, SIGKILL);
+    verbose_printf("kill job %d of pid %d\n", i+1, pid);
+    if(!jobs_deletejob(pid))
+      unix_error("(error while delete job in job_list)\n");
+  }
+  
+  verbose_printf("do_exit : exit\n");
+  exit(EXIT_SUCCESS);
   return;
 }
 
 /* do_jobs - Execute the builtin fg command */
 void do_jobs() {
-  printf("do_jobs : To be implemented\n");
+
+
+  verbose_printf("do_jobs : entering\n");
+
+  jobs_listjobs();
+
+  verbose_printf("do_jobs : exit\n");
 
   return;
 }

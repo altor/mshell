@@ -12,7 +12,6 @@ int nextjid = 1;                     /* next job ID to allocate       */
 
 
 /*** Helper routines that manipulate the job list ***/
-
 /* clearjob - Clear the entries in a job struct */
 void jobs_clearjob(struct job_t *job) {
     job->jb_pid = 0;
@@ -160,7 +159,7 @@ void jobs_listjobs() {
             default:
                 printf("listjobs: Internal error: job[%d].state=%d ", i, jobs[i].jb_state);
             }
-            printf("%s", jobs[i].jb_cmdline);
+            printf("%s\n", jobs[i].jb_cmdline);
         }
     }
 }

@@ -95,7 +95,7 @@ void sigint_handler(int sig) {
 void sigtstp_handler(int sig) {
 
   pid_t pid;
-	
+  
   verbose_printf("sigtstp_handler: entering\n");
 
 
