@@ -100,7 +100,7 @@ void do_pipe(char *cmds[MAXCMDS][MAXARGS], int nbcmd, int bg) {
    if(jobs_addjob(pid, state, cmds[0][0]) == 0)
      unix_error("do_pipe error : error while adding job)");
 
-   if(bg)
+   if(!bg)
      waitfg(pid);
   
 }
